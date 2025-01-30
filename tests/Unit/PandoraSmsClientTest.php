@@ -9,8 +9,19 @@ use PHPUnit\Framework\TestCase;
 
 class PandoraSmsClientTest extends TestCase
 {
+
+    protected function setUp(): void
+    {
+        // Set up test environment variables
+        putenv('PANDORA_SMS_USERNAME=testuser');
+        putenv('PANDORA_SMS_PASSWORD=testpass');
+    }
+
     protected function tearDown(): void
     {
+        // Clear environment variables after each test
+        putenv('PANDORA_SMS_USERNAME');
+        putenv('PANDORA_SMS_PASSWORD');
         Mockery::close();
     }
 
@@ -55,7 +66,7 @@ class PandoraSmsClientTest extends TestCase
         $reflectionProperty->setValue($client, $mockHttpClient);
 
         $result = $client->sendSms(
-            '+256775065459', 
+            '+256700000000', 
             'Hello World from Angstrom', 
             'Angstrom', 
             'transactional', 
@@ -85,7 +96,7 @@ class PandoraSmsClientTest extends TestCase
         $reflectionProperty->setValue($client, $mockHttpClient);
 
         $result = $client->sendSms(
-            '+256775065459', 
+            '+256700000000', 
             'Hello World from Angstrom', 
             'Angstrom', 
             'transactional', 

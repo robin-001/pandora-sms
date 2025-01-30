@@ -14,5 +14,14 @@ composer require angstrom/pandora-sms
 use Angstrom\PandoraSms\PandoraSmsClient;
 
 $client = new PandoraSmsClient();
-$client->sendSms('0700000000', 'Hello World!');
+// Send SMS
+$result = $client->sendSms(
+    '+1234567890', 
+    'Hello, world!', 
+    'YourSender', 
+    'transactional', 
+    'general'
+);
+
+echo $result;   
 ```
