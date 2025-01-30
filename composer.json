@@ -1,0 +1,19 @@
+{
+    "name": "angstrom/pandora-sms",
+    "description": "A PHP client for sending SMS via Pandora SMS API",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Angstrom\\PandoraSms\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Robinson Okello",
+            "email": "okellorobinson@aim.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
