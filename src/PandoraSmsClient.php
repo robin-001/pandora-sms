@@ -30,19 +30,23 @@ class PandoraSmsClient
     public function sendSms(string $number, string $message, string $sender, string $messageType, string $messageCategory): array
     {
         $params = [
-            'query' => [
-                'number' => urlencode($number),
-                'message' => urlencode($message),
-                'sender' => urlencode($sender),
-                'username' => urlencode($this->username),
-                'password' => urlencode($this->password),
-                'message_type' => urlencode($messageType),
-                'message_category' => urlencode($messageCategory)
+            'form_params' => [
+                'number' => $number,
+                'message' => $message,
+                'sender' => $sender,
+                'sender_id' => $sender,
+                'username' => $this->username,
+                'password' => $this->password,
+                'message_type' => $messageType,
+                'message_category' => $messageCategory
+            ],
+            'headers' => [
+                'Content-Type' => 'application/x-www-form-urlencoded'
             ]
         ];
 
         try {
-            $response = $this->httpClient->get($this->baseUrl, $params);
+            $response = $this->httpClient->post($this->baseUrl, $params);
             return json_decode($response->getBody()->getContents(), true);
         } catch (GuzzleException $e) {
             return ['success' => false, 'error_message' => $e->getMessage()];
