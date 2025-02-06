@@ -52,11 +52,27 @@ class PandoraSmsClientTest extends TestCase
         $mockResponse
             ->shouldReceive('getBody->getContents')
             ->once()
-            ->andReturn(json_encode(['success' => true]));
+            ->andReturn(json_encode([
+                'statusCode' => 201,
+                'success' => true,
+                'messages' => ['Message sent successfully'],
+                'data' => [
+                    'supported_contacts' => 1,
+                    'unsupported_contacts' => 0,
+                    'sms_cost' => 25,
+                    'balance' => 9430
+                ]
+            ]));
 
         $mockHttpClient
-            ->shouldReceive('get')
+            ->shouldReceive('post')
             ->once()
+            ->withArgs(function ($url, $params) {
+                return $url === 'https://www.sms.thepandoranetworks.com/API/send_sms/' &&
+                    isset($params['form_params']) &&
+                    $params['form_params']['message_type'] === 'non_customised' &&
+                    $params['form_params']['message_category'] === 'bulk';
+            })
             ->andReturn($mockResponse);
 
         // Use reflection to set the mocked HTTP client
@@ -66,14 +82,17 @@ class PandoraSmsClientTest extends TestCase
         $reflectionProperty->setValue($client, $mockHttpClient);
 
         $result = $client->sendSms(
-            '+256700000000', 
+            '0700000000', 
             'Hello World from Angstrom', 
             'Angstrom', 
-            'transactional', 
-            'general'
+            'non_customised', 
+            'bulk'
         );
 
         $this->assertTrue($result['success']);
+        $this->assertEquals(201, $result['statusCode']);
+        $this->assertArrayHasKey('data', $result);
+        $this->assertEquals(25, $result['data']['sms_cost']);
     }
 
     public function testSendSmsFailure()
@@ -82,11 +101,11 @@ class PandoraSmsClientTest extends TestCase
         $mockHttpClient = Mockery::mock(Client::class);
 
         $mockHttpClient
-            ->shouldReceive('get')
+            ->shouldReceive('post')
             ->once()
             ->andThrow(new \GuzzleHttp\Exception\RequestException(
                 'Error communicating with API', 
-                new \GuzzleHttp\Psr7\Request('GET', 'test')
+                new \GuzzleHttp\Psr7\Request('POST', 'test')
             ));
 
         // Use reflection to set the mocked HTTP client
@@ -96,11 +115,11 @@ class PandoraSmsClientTest extends TestCase
         $reflectionProperty->setValue($client, $mockHttpClient);
 
         $result = $client->sendSms(
-            '+256700000000', 
+            '0700000000', 
             'Hello World from Angstrom', 
             'Angstrom', 
-            'transactional', 
-            'general'
+            'non_customised', 
+            'bulk'
         );
 
         $this->assertFalse($result['success']);
